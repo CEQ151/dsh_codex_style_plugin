@@ -4,13 +4,13 @@ window.__ModuleLoader__.load({
     var module = { exports: {} };
     var exports = module.exports;
 
-const CARD_WIDTH = 320
+const CARD_WIDTH = 340
 const CARD_MARGIN_RIGHT = 16
 const SIDE = 32
 const MIN_GAP = 12
 const CHAT_MAX_WIDTH = 860
 const CHAT_MIN_WIDTH = 520
-const COLLAPSE_LEFT_SHIFT = 64
+const COLLAPSE_LEFT_SHIFT = 24
 
 const CSS = `
 [data-phase] {
@@ -53,9 +53,10 @@ function apply(ctx) {
       const centerLeft = rect.left
       const centerWidth = rect.width
       const cardLeft = centerWidth - CARD_MARGIN_RIGHT - CARD_WIDTH
-      const available = cardLeft - SIDE - MIN_GAP
-      const chatWidth = Math.max(CHAT_MIN_WIDTH, Math.min(CHAT_MAX_WIDTH, available - MIN_GAP))
-      const gap = Math.max(MIN_GAP, (available - chatWidth) / 2)
+      const track = cardLeft - SIDE
+      let chatWidth = Math.min(CHAT_MAX_WIDTH, track - MIN_GAP * 2)
+      if (chatWidth < CHAT_MIN_WIDTH) chatWidth = Math.max(0, track - MIN_GAP * 2)
+      const gap = Math.max(MIN_GAP, (track - chatWidth) / 2)
       const collapsed = scrollport.closest('[data-sidebar-collapsed]') !== null
 
       let chatLeftRel
