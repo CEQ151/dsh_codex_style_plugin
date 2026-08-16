@@ -5,7 +5,7 @@ import { sourcesProjectionDefinition } from './projection.ts'
 export type * from './types.ts'
 export { applySourcesEvent, canonicalizeUrl, createSourcesState, sourcesProjectionDefinition } from './projection.ts'
 
-export const name = 'ui-sources'
+export const name = 'codex-style'
 export const inject = ['sessionProjections']
 
 export function apply(ctx: Context): void {

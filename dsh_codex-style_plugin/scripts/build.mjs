@@ -47,7 +47,7 @@ await build({
   external,
   loader: { '.css': 'text' },
   banner: {
-    js: 'window.__ModuleLoader__.load({ id: "dsh-ui-sources", factory: (require) => { var module = { exports: {} }; var exports = module.exports;',
+    js: 'window.__ModuleLoader__.load({ id: "dsh_codex-style_plugin", factory: (require) => { var module = { exports: {} }; var exports = module.exports;',
   },
   footer: {
     js: 'return module.exports; } });',

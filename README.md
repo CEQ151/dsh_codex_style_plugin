@@ -8,14 +8,14 @@ This repository is a monorepo. Each directory is one installable DSH plugin.
 
 | Directory | Package | Description |
 | --- | --- | --- |
-| `dsh-ui-sources` | `dsh-ui-sources` | Codex-style sources panel + per-turn file-change summary card + left-anchored conversation layout. |
+| `dsh_codex-style_plugin` | `dsh_codex-style_plugin` | Codex-style sources panel + per-turn file-change summary card + left-anchored conversation layout. |
 
 ## Development
 
 Each plugin has its own `package.json` and can be built independently:
 
 ```sh
-cd dsh-ui-sources
+cd dsh_codex-style_plugin
 npm install
 npm run check
 npm test
@@ -28,5 +28,5 @@ npm pack
 Ready-to-install tarballs are kept under `releases/`.
 
 ```sh
-npx @deepseek-ai/dsh plugin --profile web add -w releases/dsh-ui-sources-0.3.7.tgz
+npx @deepseek-ai/dsh plugin --profile web add -w releases/dsh_codex-style_plugin-0.3.7.tgz
 ```

@@ -1,7 +1,7 @@
 {
-  "name": "dsh-ui-sources",
+  "name": "dsh_codex-style_plugin",
   "version": "0.3.7",
-  "description": "Codex-style whole-session source panel for DeepSeek Harness",
+  "description": "Codex-style sources panel, edited-files summary, and left-anchored conversation layout for DeepSeek Harness",
   "keywords": [
     "deepseek",
     "dsh",
