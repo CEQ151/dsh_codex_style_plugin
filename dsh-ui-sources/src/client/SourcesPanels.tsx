@@ -212,6 +212,10 @@ function fitCardWidth(scrollport: HTMLElement): number {
     const match = style !== null ? /^([\d.]+)px$/.exec(style.getPropertyValue(name).trim()) : null
     return match !== null ? Number(match[1]) : fallback
   }
+  // The chat-layout plugin publishes a fixed card width so the card does not
+  // move or resize when the sidebar expands/collapses.
+  const fixedWidth = token('--dsh-sources-card-width', 0)
+  if (fixedWidth > 0) return fixedWidth
   const contentWidth = token('--dsh-chat-content-width', 748)
   const clearance = token('--dsh-composer-side-clearance', 16)
   const side = clearance + 16
