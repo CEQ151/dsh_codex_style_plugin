@@ -199,7 +199,7 @@ export function SourcesDetailsPanel({
 }
 
 /** Cap and floor for the card's self-fitted width (px). */
-const CARD_WIDTH_CAP = 300
+const CARD_WIDTH_CAP = 360
 const CARD_WIDTH_FLOOR = 160
 
 /** Fit the card into the chat area's right gutter so it never covers the
