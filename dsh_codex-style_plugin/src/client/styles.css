@@ -39,6 +39,7 @@
 /* ── Resident card (wide screens, sticky at the top-right of the chat) ──── */
 
 .dshSources__card {
+  box-sizing: border-box;
   width: min(300px, calc(100% - 32px));
   margin: 8px 16px 0 0;
   display: flex;

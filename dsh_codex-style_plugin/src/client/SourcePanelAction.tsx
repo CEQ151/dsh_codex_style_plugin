@@ -12,6 +12,7 @@ import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-cli
 import type { OpenLocalPath, SourcesPanelController } from './controller.ts'
 import { NS } from './locales.ts'
 import { SourcesCard, SourcesCompactPanel } from './SourcesPanels.tsx'
+import { computeChatLayout, SIDEBAR_EXPANDED_WIDTH } from './chatLayout.ts'
 
 const DETAILS_BREAKPOINT = 1220
 
@@ -37,6 +38,20 @@ function isCompactViewport(): boolean {
 /** The chat scrollport — the resident card lives in flow at its top. */
 function conversationScrollport(): HTMLElement | null {
   return document.querySelector<HTMLElement>('[data-conversation-scroll]')
+}
+
+function cardOverlapsChat(): boolean {
+  const scrollport = conversationScrollport()
+  if (scrollport === null) return false
+  const rect = scrollport.getBoundingClientRect()
+  const contentRight = rect.left + scrollport.clientWidth
+  const layout = computeChatLayout({
+    expandedLeft: SIDEBAR_EXPANDED_WIDTH,
+    expandedRight: contentRight,
+    currentLeft: rect.left,
+    cardVisible: true,
+  })
+  return layout.wouldOverlap
 }
 
 export function SourcePanelAction({
@@ -134,6 +149,42 @@ export function SourcePanelAction({
       host?.remove()
     }
   }, [compactViewport, sessionId])
+
+  /* Automatically hide the resident card when the window is too narrow for it
+     to sit beside the chat without overlapping. The header button can still
+     force it open (suppressAutoHide). */
+  useEffect(() => {
+    if (compactViewport) return
+    let cancelled = false
+    let raf = 0
+    const check = () => {
+      if (cancelled) return
+      if (cardOverlapsChat()) {
+        panel.autoHideCard()
+      } else {
+        panel.clearAutoHideSuppression()
+      }
+    }
+    const schedule = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(check)
+    }
+    const scrollport = conversationScrollport()
+    schedule()
+    window.addEventListener('resize', schedule)
+    const observer = scrollport !== null ? new ResizeObserver(schedule) : null
+    if (observer !== null && scrollport !== null) observer.observe(scrollport)
+    const mutation = new MutationObserver(schedule)
+    const root = scrollport?.closest<HTMLElement>('[data-phase]')
+    if (root !== null && root !== undefined) mutation.observe(root, { attributes: true, attributeFilter: ['style'] })
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', schedule)
+      observer?.disconnect()
+      mutation.disconnect()
+    }
+  }, [compactViewport, panel])
 
   useLayoutEffect(() => {
     if (!compactOpen) return

@@ -38,7 +38,7 @@ export function apply(ctx: ClientContext): void {
   }, 'ui-sources: styles')
 
   const listeners = new Set<() => void>()
-  let state: SourcesPanelState = { cardVisible: true, detailsOpen: false }
+  let state: SourcesPanelState = { cardVisible: true, detailsOpen: false, autoHidden: false, suppressAutoHide: false }
   let disposeDetails: (() => void) | undefined
   const openLocalPath: OpenLocalPath =
     (cwd, path) => ctx.workspaces.openPath(resolveWorkspacePath(cwd, path))
@@ -56,10 +56,26 @@ export function apply(ctx: ClientContext): void {
     getSnapshot: () => state,
     setCardVisible: (visible) => {
       if (state.cardVisible === visible) return
-      setState({ cardVisible: visible })
+      setState({ cardVisible: visible, autoHidden: false, suppressAutoHide: false })
     },
     toggleCard: () => {
-      setState({ cardVisible: !state.cardVisible })
+      if (state.autoHidden) {
+        setState({ cardVisible: true, autoHidden: false, suppressAutoHide: true })
+        return
+      }
+      setState({ cardVisible: !state.cardVisible, autoHidden: false, suppressAutoHide: false })
+    },
+    autoHideCard: () => {
+      if (!state.cardVisible || state.autoHidden || state.suppressAutoHide) return
+      setState({ cardVisible: false, autoHidden: true })
+    },
+    showCard: () => {
+      if (state.cardVisible && !state.autoHidden) return
+      setState({ cardVisible: true, autoHidden: false, suppressAutoHide: true })
+    },
+    clearAutoHideSuppression: () => {
+      if (!state.suppressAutoHide) return
+      setState({ suppressAutoHide: false })
     },
     openDetails: () => {
       if (state.detailsOpen) {
