@@ -202,10 +202,9 @@ export function SourcesDetailsPanel({
 const CARD_WIDTH_CAP = 360
 const CARD_WIDTH_FLOOR = 160
 
-/** Fit the card into the chat area's right gutter so it never covers the
-  * message text: the message column is a centered `--dsh-chat-content-width`
-  * box inside a `--dsh-composer-side-clearance` + 16px padded scrollport, so
-  * the free space to its right is `side + (width - 2·side - content)/2`. */
+/** Fit the card into the right workspace beside the left-anchored chat
+  * column. The column starts `side` px from the scrollport's left edge, so
+  * the card may use everything to its right. */
 function fitCardWidth(scrollport: HTMLElement): number {
   const root = scrollport.closest<HTMLElement>('[data-phase]')
   const style = root !== null ? getComputedStyle(root) : null
@@ -217,7 +216,9 @@ function fitCardWidth(scrollport: HTMLElement): number {
   const clearance = token('--dsh-composer-side-clearance', 16)
   const side = clearance + 16
   const width = scrollport.clientWidth
-  const gutter = side + Math.max(0, (width - side * 2 - contentWidth) / 2)
+  // Left-anchored conversation lane: the card can use the full width to the
+  // right of the chat column instead of the centered-layout half-gutter.
+  const gutter = Math.max(0, width - side - contentWidth)
   return Math.min(CARD_WIDTH_CAP, Math.max(CARD_WIDTH_FLOOR, Math.round(gutter - 24)))
 }
 

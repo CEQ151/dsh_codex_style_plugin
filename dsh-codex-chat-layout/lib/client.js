@@ -6,9 +6,7 @@ window.__ModuleLoader__.load({
 
     function apply(ctx) {
       ctx.effect(() => {
-        const css = `
-/* Codex-style left-anchored conversation lane */
-[data-phase] {
+        const css = `[data-phase] {
   --dsh-chat-content-width: 860px;
 }
 
@@ -23,10 +21,19 @@ window.__ModuleLoader__.load({
   margin-left: 16px;
 }
 
+/* Sidebar collapsed: keep the conversation lane near its expanded position.
+   Default expanded sidebar 280px - collapsed rail 56px = 224px preserved. */
+[data-sidebar-collapsed] [data-conversation-scroll] [data-chat-flow] {
+  margin-left: 224px;
+}
+
+[data-sidebar-collapsed] [data-composer-card] {
+  margin-left: calc(16px + 224px);
+}
+
 [data-conversation-scroll] [data-chat-flow] > * {
   min-width: 0;
-}
-`;
+}`;
         const element = document.createElement("style");
         element.dataset.plugin = "dsh-codex-chat-layout";
         element.textContent = css;
