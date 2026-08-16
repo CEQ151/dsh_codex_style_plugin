@@ -1,3 +1,5 @@
+import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+
 const CARD_WIDTH = 340
 const CARD_MARGIN_RIGHT = 16
 const SIDE = 32
@@ -27,18 +29,24 @@ const CSS = `
 }
 `
 
-export function apply(ctx) {
+export function installChatLayout(ctx: ClientContext): void {
   ctx.effect(() => {
     const element = document.createElement('style')
-    element.dataset.plugin = 'dsh-codex-chat-layout'
+    element.dataset.plugin = 'dsh-ui-sources'
     element.textContent = CSS
     document.head.append(element)
 
-    let frame = null
-    let root = null
-    let scrollport = null
-    let expandedCenterLeft = null
-    let expandedChatAbs = null
+    let frame: HTMLElement | null = null
+    let root: HTMLElement | null = null
+    let scrollport: HTMLElement | null = null
+    let lastExpandedCenterLeft: number | null = null
+    let lastExpandedCenterWidth: number | null = null
+
+    const locate = () => {
+      frame = document.querySelector('[data-shell-overlay]')?.parentElement ?? null
+      root = document.querySelector('[data-phase]')
+      scrollport = document.querySelector('[data-conversation-scroll]')
+    }
 
     const setVars = () => {
       if (root === null || scrollport === null) return
@@ -46,34 +54,34 @@ export function apply(ctx) {
       if (rect.width <= 0) return
       const centerLeft = rect.left
       const centerWidth = rect.width
-      const cardLeft = centerWidth - CARD_MARGIN_RIGHT - CARD_WIDTH
-      const track = cardLeft - SIDE
-      let chatWidth = Math.min(CHAT_MAX_WIDTH, track - MIN_GAP * 2)
-      if (chatWidth < CHAT_MIN_WIDTH) chatWidth = Math.max(0, track - MIN_GAP * 2)
-      const gap = Math.max(MIN_GAP, (track - chatWidth) / 2)
       const collapsed = scrollport.closest('[data-sidebar-collapsed]') !== null
 
-      let chatLeftRel
+      let expandedCenterLeft: number
+      let expandedCenterWidth: number
       if (collapsed) {
-        const assumedExpandedCenterLeft = expandedCenterLeft ?? centerLeft + (280 - 56)
-        const assumedExpandedAbs = expandedChatAbs ?? assumedExpandedCenterLeft + SIDE + gap
-        chatLeftRel = assumedExpandedAbs - COLLAPSE_LEFT_SHIFT - centerLeft
+        expandedCenterLeft = lastExpandedCenterLeft ?? centerLeft + (280 - 56)
+        expandedCenterWidth = lastExpandedCenterWidth ?? centerWidth - (280 - 56)
       } else {
-        chatLeftRel = SIDE + gap
         expandedCenterLeft = centerLeft
-        expandedChatAbs = centerLeft + chatLeftRel
+        expandedCenterWidth = centerWidth
+        lastExpandedCenterLeft = centerLeft
+        lastExpandedCenterWidth = centerWidth
       }
 
+      const expandedCardLeft = expandedCenterWidth - CARD_MARGIN_RIGHT - CARD_WIDTH
+      const expandedTrack = expandedCardLeft - SIDE
+      let chatWidth = Math.min(CHAT_MAX_WIDTH, expandedTrack - MIN_GAP * 2)
+      if (chatWidth < CHAT_MIN_WIDTH) chatWidth = Math.max(0, expandedTrack - MIN_GAP * 2)
+      const expandedGap = Math.max(MIN_GAP, (expandedTrack - chatWidth) / 2)
+      const expandedChatAbs = expandedCenterLeft + SIDE + expandedGap
+
+      const chatLeftAbs = collapsed ? expandedChatAbs - COLLAPSE_LEFT_SHIFT : expandedChatAbs
+      const chatLeftRel = chatLeftAbs - centerLeft
       const marginLeft = Math.max(0, chatLeftRel - SIDE)
+
       root.style.setProperty('--dsh-chat-content-width', `${Math.round(chatWidth)}px`)
       root.style.setProperty('--dsh-chat-flow-margin-left', `${Math.round(marginLeft)}px`)
       root.style.setProperty('--dsh-sources-card-width', `${CARD_WIDTH}px`)
-    }
-
-    const locate = () => {
-      frame = document.querySelector('[data-shell-overlay]')?.parentElement ?? null
-      root = document.querySelector('[data-phase]')
-      scrollport = document.querySelector('[data-conversation-scroll]')
     }
 
     const measure = () => {
@@ -89,11 +97,7 @@ export function apply(ctx) {
     if (frame !== null) observer.observe(frame)
     window.addEventListener('resize', measure)
 
-    const mutation = new MutationObserver(() => {
-      expandedCenterLeft = null
-      expandedChatAbs = null
-      measure()
-    })
+    const mutation = new MutationObserver(() => { measure() })
     if (frame !== null) {
       mutation.observe(frame, {
         attributes: true,
@@ -108,5 +112,5 @@ export function apply(ctx) {
       window.removeEventListener('resize', measure)
       element.remove()
     }
-  }, 'dsh-codex-chat-layout: styles')
+  }, 'dsh-ui-sources: chat layout')
 }

@@ -6,6 +6,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '../types.ts'
 import type { OpenLocalPath, SourcesPanelController, SourcesPanelState } from './controller.ts'
 import { EditedFilesCard } from './EditedFilesCard.tsx'
+import { installChatLayout } from './chatLayout.ts'
 import { fileChangesDefinition, selectFileChanges } from './turn-file-changes.ts'
 import { SourcePanelAction, type SourcesPanelInjected } from './SourcePanelAction.tsx'
 import { SourcesDetailsPanel, type SourcesDetailsInjected } from './SourcesPanels.tsx'
@@ -87,6 +88,7 @@ export function apply(ctx: ClientContext): void {
   }
 
   ctx.conversationEvents.register(fileChangesDefinition)
+  installChatLayout(ctx)
   ctx.effect(() => () => { panel.closeDetails() }, 'ui-sources: panel controller')
   ctx.slots.inject('conversation.chat.turnTail', () => ctx.slots.register({
     name: 'conversation.chat.turnTail',
