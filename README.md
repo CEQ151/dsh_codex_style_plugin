@@ -22,3 +22,11 @@ npm test
 npm run build
 npm pack
 ```
+
+## Releases
+
+Ready-to-install tarballs are kept under `releases/`.
+
+```sh
+npx @deepseek-ai/dsh plugin --profile web add -w releases/dsh-ui-sources-0.3.7.tgz
+```
