@@ -8,8 +8,7 @@ This repository is a monorepo. Each directory is one installable DSH plugin.
 
 | Directory | Package | Description |
 | --- | --- | --- |
-| `dsh-ui-sources` | `dsh-ui-sources` | Codex-style sources panel + per-turn file-change summary card. |
-| `dsh-codex-chat-layout` | `dsh-codex-chat-layout` | Left-anchored conversation lane; extra width stays on the right workspace. |
+| `dsh-ui-sources` | `dsh-ui-sources` | Codex-style sources panel + per-turn file-change summary card + left-anchored conversation layout. |
 
 ## Development
 
@@ -30,5 +29,4 @@ Ready-to-install tarballs are kept under `releases/`.
 
 ```sh
 npx @deepseek-ai/dsh plugin --profile web add -w releases/dsh-ui-sources-0.3.7.tgz
-npx @deepseek-ai/dsh plugin --profile web add -w releases/dsh-codex-chat-layout-0.1.0.tgz
 ```
